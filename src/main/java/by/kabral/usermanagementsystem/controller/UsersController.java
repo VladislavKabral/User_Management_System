@@ -3,6 +3,7 @@ package by.kabral.usermanagementsystem.controller;
 import by.kabral.usermanagementsystem.dto.UserWIthStatesDTO;
 import by.kabral.usermanagementsystem.dto.UserWithOnlyIdDTO;
 import by.kabral.usermanagementsystem.dto.UserDTO;
+import by.kabral.usermanagementsystem.model.ImagineRequest;
 import by.kabral.usermanagementsystem.model.User;
 import by.kabral.usermanagementsystem.model.UserState;
 import by.kabral.usermanagementsystem.service.UsersService;
@@ -11,6 +12,7 @@ import by.kabral.usermanagementsystem.util.UserException;
 import by.kabral.usermanagementsystem.util.UserValidator;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -20,8 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")
@@ -33,28 +33,30 @@ public class UsersController {
 
     private final UserValidator userValidator;
 
-    public UsersController(UsersService usersService, ModelMapper modelMapper, UserValidator userValidator) {
+    private final ImagineRequest imagineRequest;
+
+    private static final int REQUEST_TIME = 7000;
+
+    @Autowired
+    public UsersController(UsersService usersService, ModelMapper modelMapper, UserValidator userValidator, ImagineRequest imagineRequest) {
         this.usersService = usersService;
         this.modelMapper = modelMapper;
         this.userValidator = userValidator;
-    }
-
-    @GetMapping
-    public List<UserDTO> findAll() {
-        return usersService.findAll()
-                .stream()
-                .map(this::convertToUserDTO)
-                .collect(Collectors.toList());
+        this.imagineRequest = imagineRequest;
     }
 
     @GetMapping("/{id}")
     public UserDTO findById(@PathVariable("id") int id) throws UserException {
+        imagineRequest.wait(REQUEST_TIME);
+
         return convertToUserDTO(usersService.findById(id));
     }
 
     @PostMapping
     public UserWithOnlyIdDTO createUser(@RequestBody @Valid UserDTO userDTO, BindingResult bindingResult)
             throws UserException {
+
+        imagineRequest.wait(REQUEST_TIME);
 
         User user = convertToUser(userDTO);
 
@@ -77,6 +79,8 @@ public class UsersController {
 
     @PatchMapping("/{id}")
     public UserWIthStatesDTO updateUserState(@RequestBody UserWIthStatesDTO userWIthStatesDTO, @PathVariable("id") int id) throws UserException {
+
+        imagineRequest.wait(REQUEST_TIME);
 
         try {
             UserState.valueOf(userWIthStatesDTO.getCurrentState());
