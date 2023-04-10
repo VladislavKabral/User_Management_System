@@ -92,4 +92,12 @@ public class User {
      */
     @Column(name = "user_created_at")
     private LocalDateTime createdAt;
+
+    public User(String lastname, String firstname, String username, String email, LocalDate dateOfBirthday) {
+        this.lastname = lastname;
+        this.firstname = firstname;
+        this.username = username;
+        this.email = email;
+        this.dateOfBirthday = dateOfBirthday;
+    }
 }

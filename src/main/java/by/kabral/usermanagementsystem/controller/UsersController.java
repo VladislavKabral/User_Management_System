@@ -148,7 +148,7 @@ public class UsersController {
         try {
             UserState.valueOf(userWIthStatesDTO.getCurrentState());
         } catch (IllegalArgumentException e) {
-            throw new UserException(userWIthStatesDTO.getCurrentState() + " state is invalid");
+            throw new UserException("'" + userWIthStatesDTO.getCurrentState() + "' state is invalid");
         }
 
         User user = usersService.findById(id);
